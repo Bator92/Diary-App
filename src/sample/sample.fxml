@@ -1,8 +1,44 @@
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.GridPane?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<GridPane fx:controller="sample.Controller"
-          xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
-</GridPane>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="456.0" prefWidth="965.0" xmlns="http://javafx.com/javafx/8.0.112-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <TabPane prefHeight="422.0" prefWidth="965.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Új esemény felvétele">
+                    <content>
+                        <AnchorPane prefHeight="443.0" prefWidth="965.0">
+                     <children>
+                        <DatePicker layoutX="14.0" layoutY="115.0" />
+                        <Label layoutX="14.0" layoutY="14.0" text="Megnevezés" />
+                        <TextField layoutX="14.0" layoutY="31.0" />
+                        <Label layoutX="14.0" layoutY="56.0" text="Leírás" />
+                        <TextField layoutX="14.0" layoutY="73.0" />
+                        <Label layoutX="16.0" layoutY="98.0" text="Időpont" />
+                        <Button layoutX="16.0" layoutY="197.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="129.0" text="Létrehozás" />
+                        <Label layoutX="16.0" layoutY="140.0" text="Helyszín" />
+                     </children></AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Mai események">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                </Tab>
+                <Tab text="Heti események">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</Pane>
