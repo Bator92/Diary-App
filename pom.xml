@@ -95,6 +95,11 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.15.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>eclipselink</artifactId>
+            <version>2.5.0</version>
+        </dependency>
     </dependencies>
 
 

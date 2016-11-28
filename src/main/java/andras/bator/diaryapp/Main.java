@@ -1,35 +1,41 @@
 package andras.bator.diaryapp;
 
+import andras.bator.diaryapp.dao.EventDAO;
+import andras.bator.diaryapp.model.EventEntity;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("view/sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"));
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
-
     public static void main(String[] args) {
-        Connection c = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-        } catch ( Exception e ) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            System.exit(0);
-        }
-        System.out.println("Opened database successfully");
+        EventDAO eventDAO = new EventDAO();
+
+
+        EventEntity eventEntity = new EventEntity("név", "leírás", "dátum", "Budapest", "valaki" );
+
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("diaryapp");
+        EntityManager em = emf.createEntityManager();
+
+        em.getTransaction().begin();
+        em.persist(eventEntity);
+        em.getTransaction().commit();
+        em.close();
         launch(args);
     }
 }
