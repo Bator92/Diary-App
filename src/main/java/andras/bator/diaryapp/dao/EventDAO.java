@@ -12,15 +12,14 @@ import javax.persistence.PersistenceContext;
  */
 public class EventDAO extends AbstractDAO<EventEntity> {
 
-    @PersistenceContext
-    private EntityManager em;
-
     public EventDAO() {
         super(EventEntity.class);
     }
 
     @Override
     public EntityManager em() {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("diaryapp");
+        EntityManager em = emf.createEntityManager();
         return em;
     }
 
