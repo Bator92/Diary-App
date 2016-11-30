@@ -87,8 +87,6 @@
 
         </profile>
     </profiles>
-
-
     <dependencies>
         <dependency>
             <groupId>org.xerial</groupId>
@@ -105,7 +103,10 @@
             <artifactId>tornadofx-controls</artifactId>
             <version>1.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.jfxtras</groupId>
+            <artifactId>jfxtras-labs</artifactId>
+            <version>8.0-r5</version>
+        </dependency>
     </dependencies>
-
-
 </project>

@@ -6,7 +6,7 @@
 
 <persistence-unit name="diaryapp" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>andras.bator.diaryapp.model.EventEntity</class>
+    <class>andras.bator.diaryapp.model.AppointmentEntity</class>
     <class>andras.bator.diaryapp.util.LocalDateTimeAttributeConverter</class>
     <class>andras.bator.diaryapp.util.LocalDateAttributeConverter</class>
     <properties>
