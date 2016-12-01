@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -12,7 +15,9 @@
 <?import jfxtras.scene.control.agenda.Agenda?>
 <?import tornadofx.control.DateTimePicker?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="456.0" prefWidth="965.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="andras.bator.diaryapp.controller.Controller">
+<Pane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="456.0" prefWidth="965.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="andras.bator.diaryapp.controller.Controller">
     <children>
         <TabPane prefHeight="422.0" prefWidth="965.0" tabClosingPolicy="UNAVAILABLE">
             <tabs>
@@ -20,43 +25,70 @@
                     <content>
                         <AnchorPane prefHeight="443.0" prefWidth="965.0">
                             <children>
-                                <Label layoutX="14.0" layoutY="14.0" text="Megnevezés" />
-                                <TextField fx:id="name" layoutX="14.0" layoutY="31.0" prefHeight="25.0" prefWidth="267.0" />
-                                <Label layoutX="14.0" layoutY="56.0" text="Leírás" />
-                                <TextField fx:id="description" layoutX="14.0" layoutY="73.0" prefHeight="25.0" prefWidth="266.0" />
-                                <Label layoutX="16.0" layoutY="98.0" text="Időpont" />
-                                <DateTimePicker fx:id="dateTimeStart" layoutX="14.0" layoutY="115.0" />
-                                <Label layoutX="16.0" layoutY="140.0" text="Helyszín" />
-                                <TextField fx:id="location" layoutX="14.0" layoutY="157.0" prefHeight="25.0" prefWidth="264.0" />
-                                <Label layoutX="16.0" layoutY="182.0" text="Résztvevők (e-mail címek vesszővel elválasztva)" />
-                                <TextField fx:id="participants" layoutX="14.0" layoutY="199.0" prefHeight="25.0" prefWidth="414.0" />
-                                <Button fx:id="createButton" layoutX="16.0" layoutY="257.0" mnemonicParsing="false" onAction="#handleCreateButtonAction" prefHeight="25.0" prefWidth="129.0" text="Létrehozás" />
+                                <Label layoutX="14.0" layoutY="14.0" text="Megnevezés"/>
+                                <TextField fx:id="summary" layoutX="14.0" layoutY="31.0" prefHeight="25.0"
+                                           prefWidth="276.0"/>
+                                <Label layoutX="14.0" layoutY="56.0" text="Leírás"/>
+                                <TextField fx:id="description" layoutX="14.0" layoutY="73.0" prefHeight="25.0"
+                                           prefWidth="276.0"/>
+                                <Label layoutX="16.0" layoutY="98.0" text="Kezdő időpont"/>
+                                <DateTimePicker fx:id="dateTimeStart" layoutX="14.0" layoutY="115.0" prefHeight="25.0"
+                                                prefWidth="135.0"/>
+                                <Label layoutX="156.0" layoutY="98.0" text="Vég időpont"/>
+                                <DateTimePicker fx:id="dateTimeEnd" layoutX="156.0" layoutY="115.0" prefHeight="25.0"
+                                                prefWidth="133.0"/>
+                                <Label layoutX="16.0" layoutY="140.0" text="Helyszín"/>
+                                <TextField fx:id="location" layoutX="14.0" layoutY="157.0" prefHeight="25.0"
+                                           prefWidth="275.0"/>
+                                <Label layoutX="16.0" layoutY="182.0"
+                                       text="Résztvevők (e-mail címek vesszővel elválasztva)"/>
+                                <TextField fx:id="participants" layoutX="14.0" layoutY="199.0" prefHeight="25.0"
+                                           prefWidth="414.0"/>
+                                <Button fx:id="createButton" layoutX="16.0" layoutY="257.0" mnemonicParsing="false"
+                                        onAction="#handleCreateButtonAction" prefHeight="25.0" prefWidth="129.0"
+                                        text="Létrehozás"/>
+                                <CheckBox fx:id="wholeDay" layoutX="305.0" layoutY="119.0" mnemonicParsing="false"
+                                          text="CheckBox"/>
+
+
                             </children>
                         </AnchorPane>
                     </content>
                 </Tab>
-                <Tab onSelectionChanged="#tabChanged" text="Mai események">
+                <Tab onSelectionChanged="#tabTodayChanged" text="Mai események">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                         <VBox prefHeight="393.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                             <TableView fx:id="todayEventsTable" layoutX="-2.0" layoutY="125.0" prefHeight="401.0" prefWidth="965.0">
-                                 <columns>
-                                 </columns>
-                             </TableView>
-                         </VBox>
-                     </children></AnchorPane>
+                            <children>
+                                <VBox prefHeight="393.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0"
+                                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                      AnchorPane.topAnchor="0.0">
+                                    <TableView fx:id="todayEventsTable" layoutX="-2.0" layoutY="125.0"
+                                               prefHeight="401.0" prefWidth="965.0">
+                                        <columns>
+                                        </columns>
+                                    </TableView>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
                     </content>
                 </Tab>
-                <Tab text="Heti események">
+                <Tab onSelectionChanged="#tabWeeklyChanged" text="Heti események">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <Agenda fx:id="eventCalendar" layoutX="-1.0" layoutY="86.0" prefHeight="393.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children></AnchorPane>
+                            <children>
+                                <Agenda fx:id="eventCalendar" layoutX="-1.0" layoutY="86.0" prefHeight="393.0"
+                                        prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                        AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="28.0"/>
+                                <Button layoutX="14.0" layoutY="2.0" mnemonicParsing="false"
+                                        onAction="#weeklyEventsSaved" text="Mentés"/>
+                            </children>
+                        </AnchorPane>
                     </content>
                 </Tab>
             </tabs>
         </TabPane>
+        <Label layoutX="14.0" layoutY="426.0" text="%language"/>
+        <ChoiceBox fx:id="choiceBox" layoutX="90.0" layoutY="422.0" prefHeight="25.0" prefWidth="109.0"/>
+        <ComboBox fx:id="languageChoose" layoutX="221.0" layoutY="422.0" onAction="#languageChanged" prefWidth="150.0"/>
     </children>
 </Pane>

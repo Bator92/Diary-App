@@ -32,6 +32,7 @@ public abstract class AbstractDAO<T> {
         EntityManager em = em();
         em.getTransaction().begin();
         em.merge(entity);
+        em.getTransaction().commit();
         em.close();
     }
 

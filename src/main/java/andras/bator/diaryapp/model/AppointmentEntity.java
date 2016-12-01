@@ -18,7 +18,7 @@ public class AppointmentEntity implements Agenda.Appointment {
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "summary")
     private String summary;
 
     @Column(name = "description")
@@ -171,9 +171,10 @@ public class AppointmentEntity implements Agenda.Appointment {
         this.participants = participants;
     }
 
-    public AppointmentEntity(String summary, String description, LocalDateTime startTime, LocalDateTime endTime, String location, String participants) {
+    public AppointmentEntity(String summary, String description, LocalDateTime startTime, LocalDateTime endTime, boolean wholeDay, String location, String participants) {
         this.summary = summary;
         this.description = description;
+        this.wholeDay = wholeDay;
         this.startTime = startTime;
         this.endTime = endTime;
         this.location = location;
