@@ -1,5 +1,6 @@
 package andras.bator.diaryapp.controller;
 
+import andras.bator.diaryapp.Main;
 import andras.bator.diaryapp.dao.EventDAO;
 import andras.bator.diaryapp.model.AppointmentEntity;
 import andras.bator.diaryapp.model.EventTableEntity;
@@ -39,12 +40,6 @@ public class Controller implements Initializable {
     Pane root;
 
     @FXML
-    ChoiceBox choiceBox;
-
-    @FXML
-    ResourceBundle resourcesASD;
-
-    @FXML
     TextField summary;
 
     @FXML
@@ -81,31 +76,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL locationURL, ResourceBundle resources) {
         languageChoose.setItems(FXCollections.observableArrayList("Magyar", "English"));
-        languageChoose.setValue("English");
-
-        choiceBox.setItems(FXCollections.observableArrayList("Magyar", "English"));
-        choiceBox.setValue("English");
-        choiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                Scene scene = root.getScene();
-                try {
-                    if (newValue.equals("Magyar")) {
-                        Locale locale = new Locale("hu", "HU");
-                        scene.setRoot(FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.HU", locale)));
-                        choiceBox.setValue(newValue);
-                        System.out.println(choiceBox.getValue());
-                    } else if(newValue.equals("English")){
-                        Locale locale = new Locale("en", "EN");
-                        scene.setRoot(FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.EN", locale)));
-                        choiceBox.setValue(newValue);
-                    }
-                } catch (IOException e) {
-                    //TODO
-                    e.printStackTrace();
-                }
-            }
-        });
+        languageChoose.setValue(Main.language);
 
         TableColumn dateTimeStart = new TableColumn("Start date");
         TableColumn dateTimeEnd = new TableColumn("End date");
@@ -154,13 +125,15 @@ public class Controller implements Initializable {
         try{
             if (languageChoose.getValue().equals("Magyar")) {
                 Locale locale = new Locale("hu", "HU");
+                Main.language="Magyar";
+                //languageChoose.setValue("Magyar");
                 scene.setRoot(FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.HU", locale)));
-                choiceBox.setValue("Magyar");
-                System.out.println(choiceBox.getValue());
             } else if(languageChoose.getValue().equals("English")){
                 Locale locale = new Locale("en", "EN");
+                //languageChoose.setValue("English");
+                Main.language="English";
                 scene.setRoot(FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.EN", locale)));
-                choiceBox.setValue("English");
+
             }
         } catch (IOException e) {
             e.printStackTrace();

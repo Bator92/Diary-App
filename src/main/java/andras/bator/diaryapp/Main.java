@@ -12,9 +12,10 @@ import java.util.ResourceBundle;
 
 public class Main extends Application {
 
+    public static String language="English";
+
     @Override
     public void start(Stage primaryStage) throws Exception{
-        //ResourceBundle bundle = ResourceBundle.getBundle("basename");
         Locale locale = new Locale("en", "EN");
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.EN", locale));
         primaryStage.setTitle("Diary-App");

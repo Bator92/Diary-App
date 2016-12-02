@@ -6,13 +6,15 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by abator on 11/28/2016.
  */
 public abstract class AbstractDAO<T> {
-    private Class<T> entityClass;
+    private final static Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
 
+    private Class<T> entityClass;
     public AbstractDAO(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
@@ -21,6 +23,7 @@ public abstract class AbstractDAO<T> {
     protected abstract EntityManager em();
 
     public void create(T entity) {
+        LOGGER.info(entity.toString()+" entity created");
         EntityManager em = em();
         em.getTransaction().begin();
         em.persist(entity);
@@ -29,6 +32,7 @@ public abstract class AbstractDAO<T> {
     }
 
     public void edit(T entity) {
+        LOGGER.info(entity.toString()+" entity edited");
         EntityManager em = em();
         em.getTransaction().begin();
         em.merge(entity);
@@ -37,6 +41,7 @@ public abstract class AbstractDAO<T> {
     }
 
     public void remove(T entity) {
+        LOGGER.info(entity.toString()+" entity removed");
         EntityManager em = em();
         em.getTransaction().begin();
         em.remove(em.merge(entity));
@@ -45,12 +50,14 @@ public abstract class AbstractDAO<T> {
     }
 
     public T find(Object id) {
+        LOGGER.info("AbstractDAO find(id) method called");
         EntityManager em = em();
         em.getTransaction().begin();
         return em.find(entityClass, id);
     }
 
     public List<T> findAll() {
+        LOGGER.info("AbstractDAO findAll() method called");
         EntityManager em = em();
         em.getTransaction().begin();
         CriteriaQuery<T> cq = em.getCriteriaBuilder()
@@ -73,6 +80,7 @@ public abstract class AbstractDAO<T> {
     }
 
     public int count() {
+        LOGGER.info("AbstractDAO count() method called");
         EntityManager em = em();
         em.getTransaction().begin();
         CriteriaQuery<Long> cq = em.getCriteriaBuilder()
