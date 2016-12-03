@@ -10,7 +10,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
 <?import jfxtras.scene.control.agenda.Agenda?>
 <?import tornadofx.control.DateTimePicker?>
 
@@ -46,12 +45,12 @@
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                             <children>
-                                <VBox prefHeight="393.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <TableView fx:id="todayEventsTable" layoutX="-2.0" layoutY="125.0" prefHeight="401.0" prefWidth="965.0">
+                                    <TableView fx:id="eventsTable" layoutX="-2.0" layoutY="28.0" prefHeight="364.0" prefWidth="965.0">
                                         <columns>
                                         </columns>
                                     </TableView>
-                                </VBox>
+                        <Button layoutX="14.0" layoutY="2.0" mnemonicParsing="false" onAction="#eventsSaved" text="%save" />
+                        <ComboBox fx:id="eventChangesCombo" layoutX="79.0" layoutY="2.0" onAction="#eventsChanged" prefWidth="142.0" />
                             </children>
                         </AnchorPane>
                     </content>
@@ -69,6 +68,6 @@
             </tabs>
         </TabPane>
         <Label layoutX="14.0" layoutY="426.0" text="%language" />
-        <ComboBox fx:id="languageChoose" layoutX="80.0" layoutY="422.0" onAction="#languageChanged" prefHeight="25.0" prefWidth="125.0" />
+        <ComboBox fx:id="languageChooseCombo" layoutX="80.0" layoutY="422.0" onAction="#languageChanged" prefHeight="25.0" prefWidth="125.0" />
     </children>
 </Pane>

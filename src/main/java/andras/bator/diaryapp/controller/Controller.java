@@ -3,38 +3,40 @@ package andras.bator.diaryapp.controller;
 import andras.bator.diaryapp.Main;
 import andras.bator.diaryapp.dao.EventDAO;
 import andras.bator.diaryapp.model.AppointmentEntity;
-import andras.bator.diaryapp.model.EventTableEntity;
-import javafx.beans.value.ChangeListener;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-
-import javafx.event.ActionEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
+import javafx.util.Callback;
 import jfxtras.scene.control.agenda.Agenda;
 import tornadofx.control.DateTimePicker;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class Controller implements Initializable {
+    private final static Logger LOGGER = Logger.getLogger(Controller.class.getName());
+
     @FXML
-    ComboBox languageChoose;
+    ComboBox eventChangesCombo;
+
+    @FXML
+    ComboBox languageChooseCombo;
 
     @FXML
     Pane root;
@@ -61,10 +63,15 @@ public class Controller implements Initializable {
     DateTimePicker dateTimeEnd;
 
     @FXML
-    TableView todayEventsTable;
+    TableView eventsTable;
 
     @FXML
     Agenda eventCalendar;
+
+    public static List<AppointmentEntity> appointmentsToDelete;
+
+    private static final String HUNGARIAN = "Magyar";
+    private static final String ENGLISH = "English";
 
     @FXML
     private void handleCreateButtonAction(ActionEvent e) {
@@ -73,36 +80,42 @@ public class Controller implements Initializable {
         eventDAO.create(appointmentEntity);
     }
 
+    ResourceBundle resourceBundle;
+
     @Override
     public void initialize(URL locationURL, ResourceBundle resources) {
-        languageChoose.setItems(FXCollections.observableArrayList("Magyar", "English"));
-        languageChoose.setValue(Main.language);
+        resourceBundle = resources;
 
-        TableColumn dateTimeStart = new TableColumn("Start date");
-        TableColumn dateTimeEnd = new TableColumn("End date");
-        TableColumn summary = new TableColumn("Event summary");
-        TableColumn description = new TableColumn("Description");
-        TableColumn location = new TableColumn("Location");
-        TableColumn wholeDay = new TableColumn("Whole day");
-        TableColumn participants = new TableColumn("Participants");
+        appointmentsToDelete = new ArrayList<>();
+        languageChooseCombo.setItems(FXCollections.observableArrayList(HUNGARIAN, ENGLISH));
+        languageChooseCombo.setValue(Main.language);
 
-        summary.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("summary"));
-        dateTimeStart.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, LocalDateTime>("startTime"));
-        dateTimeEnd.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, LocalDateTime>("endTime"));
-        description.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("description"));
-        location.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("location"));
-        participants.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("participants"));
-        wholeDay.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("wholeDay"));
+        eventChangesCombo.setItems(FXCollections.observableArrayList(resources.getString("allEvents"), resources.getString("todayEvents")));
+        eventChangesCombo.setValue(resources.getString("allEvents"));
 
-        todayEventsTable.getColumns().addAll(dateTimeStart, dateTimeEnd, summary, description, location, wholeDay, participants);
+        List<TableColumn> tableColumns = createTableColumns(resources);
+
+        eventsTable.getColumns().addAll(tableColumns);
+        eventsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        eventsTable.setEditable(true);
     }
 
     public void tabTodayChanged(Event event) {
-        EventDAO eventDAO = new EventDAO();
-        List<AppointmentEntity> entityListToday = eventDAO.findTodayEvents();
-        ObservableList<AppointmentEntity> data = FXCollections.observableArrayList(entityListToday);
-        todayEventsTable.setItems(data);
+        eventsChanged(new ActionEvent());
     }
+
+    public void eventsChanged(ActionEvent actionEvent) {
+        EventDAO eventDAO = new EventDAO();
+        List<AppointmentEntity> entityList = new ArrayList<>();
+            if(eventChangesCombo.getValue().equals(resourceBundle.getString("allEvents"))){
+                entityList = eventDAO.findAll();
+            } else if(eventChangesCombo.getValue().equals(resourceBundle.getString("todayEvents"))){
+                entityList = eventDAO.findTodayEvents();
+            }
+            ObservableList<AppointmentEntity> data = FXCollections.observableArrayList(entityList);
+            eventsTable.setItems(data);
+    }
+
 
     public void tabWeeklyChanged(Event event) {
         EventDAO eventDAO = new EventDAO();
@@ -120,24 +133,120 @@ public class Controller implements Initializable {
         }
     }
 
+    public void eventsSaved(ActionEvent actionEvent) {
+        EventDAO eventDAO = new EventDAO();
+        List<AppointmentEntity> appointmentEntities = eventsTable.getItems();
+        for (AppointmentEntity appointment : appointmentEntities) {
+            eventDAO.edit(appointment);
+        }
+        for (AppointmentEntity appointment : appointmentsToDelete) {
+            eventDAO.remove(appointment);
+        }
+    }
+
     public void languageChanged(ActionEvent actionEvent) {
         Scene scene = root.getScene();
-        try{
-            if (languageChoose.getValue().equals("Magyar")) {
+        try {
+            if (languageChooseCombo.getValue().equals(HUNGARIAN)) {
                 Locale locale = new Locale("hu", "HU");
-                Main.language="Magyar";
-                //languageChoose.setValue("Magyar");
+                Main.language = HUNGARIAN;
                 scene.setRoot(FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.HU", locale)));
-            } else if(languageChoose.getValue().equals("English")){
+            } else if (languageChooseCombo.getValue().equals(ENGLISH)) {
                 Locale locale = new Locale("en", "EN");
-                //languageChoose.setValue("English");
-                Main.language="English";
+                Main.language = ENGLISH;
                 scene.setRoot(FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.EN", locale)));
-
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.severe("IOException occured :" + e);
         }
 
     }
+
+    private List<TableColumn> createTableColumns(ResourceBundle resources) {
+        List<TableColumn> tableColumns = new ArrayList<>();
+        TableColumn dateTimeStart = new TableColumn<AppointmentEntity, LocalDateTime>(resources.getString("startDate"));
+        tableColumns.add(dateTimeStart);
+        TableColumn dateTimeEnd = new TableColumn<AppointmentEntity, LocalDateTime>(resources.getString("endDate"));
+        tableColumns.add(dateTimeEnd);
+        TableColumn summary = new TableColumn(resources.getString("summary"));
+        tableColumns.add(summary);
+        TableColumn description = new TableColumn(resources.getString("description"));
+        tableColumns.add(description);
+        TableColumn location = new TableColumn(resources.getString("location"));
+        tableColumns.add(location);
+        TableColumn wholeDay = new TableColumn(resources.getString("wholeDay"));
+        tableColumns.add(wholeDay);
+        TableColumn participants = new TableColumn(resources.getString("participants"));
+        tableColumns.add(participants);
+        TableColumn delete = new TableColumn();
+        tableColumns.add(delete);
+
+        Callback<TableColumn, TableCell> cellFactory = new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn p) {
+                return new EditingCell();
+            }
+        };
+
+        summary.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("summary"));
+        summary.setCellFactory(cellFactory);
+        summary.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<AppointmentEntity, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<AppointmentEntity, String> t) {
+                t.getTableView().getItems().get(t.getTablePosition().getRow()).setSummary(t.getNewValue());
+            }
+        });
+        //summary.setEditable(true);
+        dateTimeStart.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<AppointmentEntity, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<AppointmentEntity, String> param) {
+                LocalDate date = param.getValue().getStartLocalDateTime().toLocalDate();
+                LocalTime time = param.getValue().getStartLocalDateTime().toLocalTime();
+                return new ReadOnlyObjectWrapper<String>(date.toString() + " " + time.toString());
+
+            }
+        });
+        dateTimeEnd.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<AppointmentEntity, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<AppointmentEntity, String> param) {
+                LocalDate date = param.getValue().getStartLocalDateTime().toLocalDate();
+                LocalTime time = param.getValue().getStartLocalDateTime().toLocalTime();
+                return new ReadOnlyObjectWrapper<String>(date.toString() + " " + time.toString());
+
+            }
+        });
+        description.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("description"));
+        description.setCellFactory(cellFactory);
+        description.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<AppointmentEntity, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<AppointmentEntity, String> t) {
+                t.getTableView().getItems().get(t.getTablePosition().getRow()).setDescription(t.getNewValue());
+            }
+        });
+        location.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("location"));
+        location.setCellFactory(cellFactory);
+        location.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<AppointmentEntity, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<AppointmentEntity, String> t) {
+                t.getTableView().getItems().get(t.getTablePosition().getRow()).setLocation(t.getNewValue());
+            }
+        });
+        participants.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("participants"));
+        participants.setCellFactory(cellFactory);
+        participants.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<AppointmentEntity, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<AppointmentEntity, String> t) {
+                t.getTableView().getItems().get(t.getTablePosition().getRow()).setParticipants(t.getNewValue());
+            }
+        });
+        wholeDay.setCellValueFactory(new PropertyValueFactory<AppointmentEntity, String>("wholeDay"));
+        delete.setSortable(false);
+        delete.setCellFactory(
+                p -> new DeleteButtonCell(eventsTable, resourceBundle));
+
+        return tableColumns;
+    }
+
+
 }
+
