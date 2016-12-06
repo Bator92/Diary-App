@@ -32,7 +32,7 @@
                     <plugin>
                         <groupId>com.zenjava</groupId>
                         <artifactId>javafx-maven-plugin</artifactId>
-                        <version>8.6.0</version>
+                        <version>8.7.0</version>
                         <configuration>
                             <mainClass>andras.bator.diaryapp.Main</mainClass>
                             <verbose>true</verbose>
@@ -57,7 +57,7 @@
                     <plugin>
                         <groupId>com.zenjava</groupId>
                         <artifactId>javafx-maven-plugin</artifactId>
-                        <version>8.6.0</version>
+                        <version>8.7.0</version>
                         <configuration>
                             <vendor>BraveCorp</vendor>
                             <mainClass>andras.bator.diaryapp.Main</mainClass>
@@ -84,7 +84,39 @@
 
                 </plugins>
             </build>
-
+        </profile>
+        <profile>
+            <id>build-web</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.zenjava</groupId>
+                        <artifactId>javafx-maven-plugin</artifactId>
+                        <version>8.7.0</version>
+                        <configuration>
+                            <vendor>BraveCorp</vendor>
+                            <mainClass>andras.bator.diaryapp.Main</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <!-- required before build-web -->
+                                <id>create-jfxjar</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build-jar</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>create-web</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build-web</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
     <dependencies>
