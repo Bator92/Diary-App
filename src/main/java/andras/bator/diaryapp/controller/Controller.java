@@ -17,12 +17,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import jfxtras.scene.control.agenda.Agenda;
 import tornadofx.control.DateTimePicker;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -80,7 +82,7 @@ public class Controller implements Initializable {
         eventDAO.create(appointmentEntity);
     }
 
-    ResourceBundle resourceBundle;
+    private ResourceBundle resourceBundle;
 
     @Override
     public void initialize(URL locationURL, ResourceBundle resources) {
@@ -105,15 +107,40 @@ public class Controller implements Initializable {
     }
 
     public void eventsChanged(ActionEvent actionEvent) {
+
+        List<AppointmentEntity> entityList = getAppointmentEntities();
+        ObservableList<AppointmentEntity> data = FXCollections.observableArrayList(entityList);
+        eventsTable.setItems(data);
+    }
+
+    private List<AppointmentEntity> getAppointmentEntities() {
         EventDAO eventDAO = new EventDAO();
         List<AppointmentEntity> entityList = new ArrayList<>();
-            if(eventChangesCombo.getValue().equals(resourceBundle.getString("allEvents"))){
-                entityList = eventDAO.findAll();
-            } else if(eventChangesCombo.getValue().equals(resourceBundle.getString("todayEvents"))){
-                entityList = eventDAO.findTodayEvents();
+        if (eventChangesCombo.getValue().equals(resourceBundle.getString("allEvents"))) {
+            entityList = eventDAO.findAll();
+        } else if (eventChangesCombo.getValue().equals(resourceBundle.getString("todayEvents"))) {
+            entityList = eventDAO.findTodayEvents();
+        }
+        return entityList;
+    }
+
+    public void saveToFile(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(resourceBundle.getString("saveToFile"));
+        fileChooser.setInitialFileName("appointments.txt");
+        File file = fileChooser.showSaveDialog(Main.getStage());
+        if (file != null) {
+            try {
+                PrintWriter writer = new PrintWriter(file, "UTF-8");
+                List<AppointmentEntity> entityList = getAppointmentEntities();
+                for (AppointmentEntity entity: entityList) {
+                    writer.println(entity);
+                }
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            ObservableList<AppointmentEntity> data = FXCollections.observableArrayList(entityList);
-            eventsTable.setItems(data);
+        }
     }
 
 

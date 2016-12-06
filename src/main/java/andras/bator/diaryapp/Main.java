@@ -14,16 +14,23 @@ public class Main extends Application {
 
     public static String language="English";
 
+    private static Stage stage;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
+        stage = primaryStage;
         Locale locale = new Locale("en", "EN");
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("view/mainView.fxml"), ResourceBundle.getBundle("language.EN", locale));
-        primaryStage.setTitle("Diary-App");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+        stage.setTitle("Diary-App");
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static Stage getStage() {
+        return stage;
     }
 }

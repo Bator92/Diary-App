@@ -180,4 +180,18 @@ public class AppointmentEntity implements Agenda.Appointment {
         this.location = location;
         this.participants = participants;
     }
+
+    @Override
+    public String toString() {
+        return "AppointmentEntity{" +
+                "id=" + id +
+                ", summary='" + summary + '\'' +
+                ", description='" + description + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", location='" + location + '\'' +
+                ", participants='" + participants + '\'' +
+                ", wholeDay=" + wholeDay +
+                '}';
+    }
 }

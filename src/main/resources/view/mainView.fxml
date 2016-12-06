@@ -35,8 +35,6 @@
                                 <TextField fx:id="participants" layoutX="14.0" layoutY="199.0" prefHeight="25.0" prefWidth="414.0" />
                                 <Button fx:id="createButton" layoutX="16.0" layoutY="257.0" mnemonicParsing="false" onAction="#handleCreateButtonAction" prefHeight="25.0" prefWidth="129.0" text="%createAppointment" />
                                 <CheckBox fx:id="wholeDay" layoutX="305.0" layoutY="119.0" mnemonicParsing="false" text="%wholeDay" />
-
-
                             </children>
                         </AnchorPane>
                     </content>
@@ -51,6 +49,7 @@
                                     </TableView>
                         <Button layoutX="14.0" layoutY="2.0" mnemonicParsing="false" onAction="#eventsSaved" text="%save" />
                         <ComboBox fx:id="eventChangesCombo" layoutX="79.0" layoutY="2.0" onAction="#eventsChanged" prefWidth="142.0" />
+                        <Button layoutX="238.0" layoutY="2.0" mnemonicParsing="false" onAction="#saveToFile" text="%saveToFile" />
                             </children>
                         </AnchorPane>
                     </content>
