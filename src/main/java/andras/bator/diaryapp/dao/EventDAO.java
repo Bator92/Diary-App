@@ -25,7 +25,10 @@ public class EventDAO extends AbstractDAO<AppointmentEntity> {
         return em;
     }
 
-
+    /**
+     * Loads today events from database
+     * @return List of {@link AppointmentEntity}
+     */
     public List<AppointmentEntity> findTodayEvents() {
         List<AppointmentEntity> entityList = super.findAll();
         List<AppointmentEntity> entityListToday = new ArrayList<>();

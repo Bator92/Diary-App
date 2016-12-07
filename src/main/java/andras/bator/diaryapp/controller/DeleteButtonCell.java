@@ -17,6 +17,11 @@ public class DeleteButtonCell extends TableCell<AppointmentEntity, Boolean>{
     ResourceBundle resourceBundles;
     final Button cellButton;
 
+    /**
+     * Sets a Delete Button to every row in the tableview
+     * @param tblView
+     * @param resourceBundle
+     */
     DeleteButtonCell(final TableView tblView, ResourceBundle resourceBundle) {
         resourceBundles = resourceBundle;
         cellButton = new Button(resourceBundles.getString("delete"));
@@ -33,7 +38,13 @@ public class DeleteButtonCell extends TableCell<AppointmentEntity, Boolean>{
         });
     }
 
-    //Display button if the row is not empty
+
+
+    /**
+     * Display button if the row is not empty
+     * @param t
+     * @param empty
+     */
     @Override
     protected void updateItem(Boolean t, boolean empty) {
         super.updateItem(t, empty);

@@ -15,13 +15,21 @@ public abstract class AbstractDAO<T> {
     private final static Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
 
     private Class<T> entityClass;
+
     public AbstractDAO(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 
-
+    /**
+     * Returns an EntityManager
+     * @return EntityManager
+     */
     protected abstract EntityManager em();
 
+    /**
+     * Creates a new entity in database
+     * @param entity
+     */
     public void create(T entity) {
         LOGGER.info(entity.toString()+" entity created");
         EntityManager em = em();
@@ -31,6 +39,10 @@ public abstract class AbstractDAO<T> {
         em.close();
     }
 
+    /**
+     * Edit an entity in the database
+     * @param entity
+     */
     public void edit(T entity) {
         LOGGER.info(entity.toString()+" entity edited");
         EntityManager em = em();
@@ -40,6 +52,10 @@ public abstract class AbstractDAO<T> {
         em.close();
     }
 
+    /**
+     * Removes an etity from the database
+     * @param entity
+     */
     public void remove(T entity) {
         LOGGER.info(entity.toString()+" entity removed");
         EntityManager em = em();
@@ -49,6 +65,11 @@ public abstract class AbstractDAO<T> {
         em.close();
     }
 
+    /**
+     * Finds an entity from the database
+     * @param id
+     * @return Generic object
+     */
     public T find(Object id) {
         LOGGER.info("AbstractDAO find(id) method called");
         EntityManager em = em();
@@ -56,6 +77,10 @@ public abstract class AbstractDAO<T> {
         return em.find(entityClass, id);
     }
 
+    /**
+     * Returns all of the entities of a specified type from the database
+     * @return List of generic objects
+     */
     public List<T> findAll() {
         LOGGER.info("AbstractDAO findAll() method called");
         EntityManager em = em();
@@ -67,6 +92,11 @@ public abstract class AbstractDAO<T> {
         return em.createQuery(cq).getResultList();
     }
 
+    /**
+     * Returns a range of entities from the database
+     * @param range
+     * @return List of generic objects
+     */
     public List<T> findRange(int[] range) {
         EntityManager em = em();
         em.getTransaction().begin();
@@ -79,6 +109,10 @@ public abstract class AbstractDAO<T> {
         return q.getResultList();
     }
 
+    /**
+     * Counts the entites of a specified type in the database
+     * @return count
+     */
     public int count() {
         LOGGER.info("AbstractDAO count() method called");
         EntityManager em = em();
