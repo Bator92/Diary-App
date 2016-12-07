@@ -3,6 +3,7 @@ package andras.bator.diaryapp.controller;
 import andras.bator.diaryapp.Main;
 import andras.bator.diaryapp.dao.EventDAO;
 import andras.bator.diaryapp.model.AppointmentEntity;
+import andras.bator.diaryapp.model.Appointments;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -22,6 +23,10 @@ import javafx.util.Callback;
 import jfxtras.scene.control.agenda.Agenda;
 import tornadofx.control.DateTimePicker;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -145,18 +150,26 @@ public class Controller implements Initializable {
     public void saveToFile(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(resourceBundle.getString("saveToFile"));
-        fileChooser.setInitialFileName("appointments.txt");
+        fileChooser.setInitialFileName("appointments.xml");
         File file = fileChooser.showSaveDialog(Main.getStage());
         if (file != null) {
             try {
                 PrintWriter writer = new PrintWriter(file, "UTF-8");
                 List<AppointmentEntity> entityList = getAppointmentEntities();
-                for (AppointmentEntity entity : entityList) {
-                    writer.println(entity);
-                }
+
+                Appointments appointments = new Appointments(entityList);
+                JAXBContext jaxbContext = JAXBContext.newInstance(Appointments.class);
+                Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+                jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                jaxbMarshaller.marshal(appointments, file);
                 writer.close();
             } catch (IOException e) {
                 LOGGER.severe("IOException occured: " + e);
+            } catch (PropertyException e) {
+                LOGGER.severe("PropertyException occured: " + e);
+            } catch (JAXBException e) {
+                LOGGER.severe("JAXBException occured: " + e);
             }
         }
     }

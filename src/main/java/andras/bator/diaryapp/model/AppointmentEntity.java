@@ -1,8 +1,14 @@
 package andras.bator.diaryapp.model;
 
+import andras.bator.diaryapp.util.LocalDateTimeAdapter;
 import jfxtras.scene.control.agenda.Agenda;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.Calendar;
@@ -12,31 +18,43 @@ import java.util.Calendar;
  */
 @Entity
 @Table(name = "Appointment", schema = "", catalog = "")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AppointmentEntity implements Agenda.Appointment {
     @Id
     @Column(name = "id")
     @GeneratedValue
+    @XmlElement
     private Integer id;
 
     @Column(name = "summary")
+    @XmlElement
     private String summary;
 
     @Column(name = "description")
+    @XmlElement
     private String description;
 
     @Column(name = "dateStart")
+    @XmlElement
+    @XmlJavaTypeAdapter(value = LocalDateTimeAdapter.class)
     private LocalDateTime startTime;
 
     @Column(name = "dateEnd")
+    @XmlElement
+    @XmlJavaTypeAdapter(value = LocalDateTimeAdapter.class)
     private LocalDateTime endTime;
 
     @Column(name = "location")
+    @XmlElement
     private String location;
 
     @Column(name = "participants")
+    @XmlElement
     private String participants;
 
     @Column(name = "wholeday")
+    @XmlElement
     private boolean wholeDay;
 
     public AppointmentEntity() {
@@ -46,6 +64,7 @@ public class AppointmentEntity implements Agenda.Appointment {
     public Integer getId() {
         return id;
     }
+
 
     public void setId(Integer id) {
         this.id = id;
