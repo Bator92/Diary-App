@@ -3,6 +3,7 @@ package andras.bator.diaryapp.controller;
 import andras.bator.diaryapp.Main;
 import andras.bator.diaryapp.dao.EventDAO;
 import andras.bator.diaryapp.model.AppointmentEntity;
+import andras.bator.diaryapp.model.Appointments;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -22,6 +23,10 @@ import javafx.util.Callback;
 import jfxtras.scene.control.agenda.Agenda;
 import tornadofx.control.DateTimePicker;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -33,6 +38,7 @@ import java.util.logging.Logger;
 
 public class Controller implements Initializable {
     private final static Logger LOGGER = Logger.getLogger(Controller.class.getName());
+    private ResourceBundle resourceBundle;
 
     @FXML
     ComboBox eventChangesCombo;
@@ -76,13 +82,15 @@ public class Controller implements Initializable {
     private static final String ENGLISH = "English";
 
     @FXML
+    /**
+     * In this action an {@link AppointmentEntity} is created
+     */
     private void handleCreateButtonAction(ActionEvent e) {
         AppointmentEntity appointmentEntity = new AppointmentEntity(summary.getText(), description.getText(), dateTimeStart.getDateTimeValue(), dateTimeEnd.getDateTimeValue(), wholeDay.isSelected(), location.getText(), participants.getText());
         EventDAO eventDAO = new EventDAO();
         eventDAO.create(appointmentEntity);
     }
 
-    private ResourceBundle resourceBundle;
 
     @Override
     public void initialize(URL locationURL, ResourceBundle resources) {
@@ -95,24 +103,35 @@ public class Controller implements Initializable {
         eventChangesCombo.setItems(FXCollections.observableArrayList(resources.getString("allEvents"), resources.getString("todayEvents")));
         eventChangesCombo.setValue(resources.getString("allEvents"));
 
-        List<TableColumn> tableColumns = createTableColumns(resources);
+        List<TableColumn> tableColumns = createTableColumns();
 
         eventsTable.getColumns().addAll(tableColumns);
         eventsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         eventsTable.setEditable(true);
     }
 
+    /**
+     * The appointments tab was clicked
+     * @param event
+     */
     public void tabTodayChanged(Event event) {
         eventsChanged(new ActionEvent());
     }
 
+    /**
+     * This method sets the data from database inside the table
+     * @param actionEvent
+     */
     public void eventsChanged(ActionEvent actionEvent) {
-
         List<AppointmentEntity> entityList = getAppointmentEntities();
         ObservableList<AppointmentEntity> data = FXCollections.observableArrayList(entityList);
         eventsTable.setItems(data);
     }
 
+    /**
+     * This method returns a list of {@link AppointmentEntity}s according to the eventChangesCombo value
+     * @return List of {@link AppointmentEntity}
+     */
     private List<AppointmentEntity> getAppointmentEntities() {
         EventDAO eventDAO = new EventDAO();
         List<AppointmentEntity> entityList = new ArrayList<>();
@@ -124,26 +143,41 @@ public class Controller implements Initializable {
         return entityList;
     }
 
+    /**
+     * Saves the list of {@link AppointmentEntity}s to a text file
+     * @param actionEvent
+     */
     public void saveToFile(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(resourceBundle.getString("saveToFile"));
-        fileChooser.setInitialFileName("appointments.txt");
+        fileChooser.setInitialFileName("appointments.xml");
         File file = fileChooser.showSaveDialog(Main.getStage());
         if (file != null) {
             try {
                 PrintWriter writer = new PrintWriter(file, "UTF-8");
                 List<AppointmentEntity> entityList = getAppointmentEntities();
-                for (AppointmentEntity entity: entityList) {
-                    writer.println(entity);
-                }
+
+                Appointments appointments = new Appointments(entityList);
+                JAXBContext jaxbContext = JAXBContext.newInstance(Appointments.class);
+                Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+                jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                jaxbMarshaller.marshal(appointments, file);
                 writer.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.severe("IOException occured: " + e);
+            } catch (PropertyException e) {
+                LOGGER.severe("PropertyException occured: " + e);
+            } catch (JAXBException e) {
+                LOGGER.severe("JAXBException occured: " + e);
             }
         }
     }
 
-
+    /**
+     * The weekly events tab was clicked, and {@link AppointmentEntity}s was loaded from the database
+     * @param event
+     */
     public void tabWeeklyChanged(Event event) {
         EventDAO eventDAO = new EventDAO();
         List<AppointmentEntity> entityList = eventDAO.findAll();
@@ -151,6 +185,10 @@ public class Controller implements Initializable {
         eventCalendar.appointments().addAll(entityList);
     }
 
+    /**
+     * This method saves the changes of the weekly events tab to the database
+     * @param actionEvent
+     */
     public void weeklyEventsSaved(ActionEvent actionEvent) {
         EventDAO eventDAO = new EventDAO();
         List<Agenda.Appointment> appointments = eventCalendar.appointments();
@@ -160,6 +198,10 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * This method saves the changes of the all events tab
+     * @param actionEvent
+     */
     public void eventsSaved(ActionEvent actionEvent) {
         EventDAO eventDAO = new EventDAO();
         List<AppointmentEntity> appointmentEntities = eventsTable.getItems();
@@ -171,6 +213,10 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * The value of the languageChooseCombo combobox was changed, new language to the interface has been loaded
+     * @param actionEvent
+     */
     public void languageChanged(ActionEvent actionEvent) {
         Scene scene = root.getScene();
         try {
@@ -189,21 +235,25 @@ public class Controller implements Initializable {
 
     }
 
-    private List<TableColumn> createTableColumns(ResourceBundle resources) {
+    /**
+     * Creates the columns of the table
+     * @return
+     */
+    private List<TableColumn> createTableColumns() {
         List<TableColumn> tableColumns = new ArrayList<>();
-        TableColumn dateTimeStart = new TableColumn<AppointmentEntity, LocalDateTime>(resources.getString("startDate"));
+        TableColumn dateTimeStart = new TableColumn<AppointmentEntity, LocalDateTime>(resourceBundle.getString("startDate"));
         tableColumns.add(dateTimeStart);
-        TableColumn dateTimeEnd = new TableColumn<AppointmentEntity, LocalDateTime>(resources.getString("endDate"));
+        TableColumn dateTimeEnd = new TableColumn<AppointmentEntity, LocalDateTime>(resourceBundle.getString("endDate"));
         tableColumns.add(dateTimeEnd);
-        TableColumn summary = new TableColumn(resources.getString("summary"));
+        TableColumn summary = new TableColumn(resourceBundle.getString("summary"));
         tableColumns.add(summary);
-        TableColumn description = new TableColumn(resources.getString("description"));
+        TableColumn description = new TableColumn(resourceBundle.getString("description"));
         tableColumns.add(description);
-        TableColumn location = new TableColumn(resources.getString("location"));
+        TableColumn location = new TableColumn(resourceBundle.getString("location"));
         tableColumns.add(location);
-        TableColumn wholeDay = new TableColumn(resources.getString("wholeDay"));
+        TableColumn wholeDay = new TableColumn(resourceBundle.getString("wholeDay"));
         tableColumns.add(wholeDay);
-        TableColumn participants = new TableColumn(resources.getString("participants"));
+        TableColumn participants = new TableColumn(resourceBundle.getString("participants"));
         tableColumns.add(participants);
         TableColumn delete = new TableColumn();
         tableColumns.add(delete);
@@ -223,7 +273,6 @@ public class Controller implements Initializable {
                 t.getTableView().getItems().get(t.getTablePosition().getRow()).setSummary(t.getNewValue());
             }
         });
-        //summary.setEditable(true);
         dateTimeStart.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<AppointmentEntity, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures<AppointmentEntity, String> param) {
