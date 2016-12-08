@@ -29,6 +29,7 @@ public class DeleteButtonCell extends TableCell<AppointmentEntity, Boolean>{
                 AppointmentEntity appointmentEntity = (AppointmentEntity) tblView.getItems().get(selectdIndex);
                 Controller.appointmentsToDelete.add(appointmentEntity);
                 tblView.getItems().remove(selectdIndex);
+                tblView.refresh();
             }
         });
     }
